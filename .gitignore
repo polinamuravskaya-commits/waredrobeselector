@@ -70,6 +70,14 @@ web_modules/
 .env.*
 !.env.example
 
+deploy-local.env
+*.local.env
+
+# deployment secrets
+secrets/
+*.pem
+*.key
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
