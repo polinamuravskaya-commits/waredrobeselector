@@ -1,0 +1,40 @@
+{
+  "name": "wardrobe-selector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "tsx watch src/server.ts",
+    "dev:client": "vite --config vite.config.ts --host 0.0.0.0",
+    "build": "tsc -p tsconfig.json && vite build --config vite.config.ts",
+    "build:server": "tsc -p tsconfig.json",
+    "build:client": "vite build --config vite.config.ts",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "tsx --test src/**/*.test.ts",
+    "lint": "tsc --noEmit -p tsconfig.json",
+    "cloudrun:smoke": "node -e \"const url = process.env.CLOUD_RUN_URL || process.env.GCP_SERVICE_URL; if (!url) { console.error('Set CLOUD_RUN_URL or GCP_SERVICE_URL'); process.exit(1); } fetch(url + '/api/health').then(async (res) => { const text = await res.text(); console.log('status=' + res.status); console.log(text); if (!res.ok) process.exit(1); }).catch((error) => { console.error(error); process.exit(1); });\""
+  },
+  "dependencies": {
+    "@google-cloud/secret-manager": "^8.0.0",
+    "@google-cloud/storage": "^9.0.0",
+    "express": "^4.21.2",
+    "multer": "^2.5.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.4.6"
+  }
+}

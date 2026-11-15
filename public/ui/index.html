@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wardrobe Selector UI Mockup</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">✦</span>
+          <div>
+            <small>Style match</small>
+            <strong>Wardrobe</strong>
+          </div>
+        </div>
+        <button class="ghost-button">Saved</button>
+      </header>
+
+      <main class="screen-stack">
+        <section class="panel questionnaire">
+          <div class="section-head">
+            <span class="badge yellow">Mood</span>
+            <h1>Что сегодня хочется надеть?</h1>
+          </div>
+
+          <div class="field-group">
+            <label>Цвета</label>
+            <div class="color-grid">
+              <button class="color-dot red active"></button>
+              <button class="color-dot orange"></button>
+              <button class="color-dot yellow active"></button>
+              <button class="color-dot green"></button>
+              <button class="color-dot blue active"></button>
+              <button class="color-dot turquoise"></button>
+              <button class="color-dot purple"></button>
+              <button class="color-dot pink active"></button>
+              <button class="color-dot blush"></button>
+              <button class="color-dot white"></button>
+              <button class="color-dot black"></button>
+              <button class="color-dot brown"></button>
+              <button class="color-dot stripe"></button>
+              <button class="color-dot polka"></button>
+            </div>
+          </div>
+
+          <div class="field-group two-col">
+            <div>
+              <label>Низ</label>
+              <div class="segment-group">
+                <button class="chip selected">Брюки</button>
+                <button class="chip">Юбка</button>
+              </div>
+            </div>
+            <div>
+              <label>Температура</label>
+              <div class="segment-group">
+                <button class="chip selected">+22°</button>
+                <button class="chip">+16°</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Событие</label>
+            <div class="segment-group wrap">
+              <button class="chip selected">Школа</button>
+              <button class="chip">Прогулка</button>
+              <button class="chip">Кружок</button>
+              <button class="chip">Вечеринка</button>
+            </div>
+          </div>
+
+          <button class="primary-button">Показать 3 образа</button>
+        </section>
+
+        <section class="panel results">
+          <div class="section-head row">
+            <div>
+              <span class="badge fuchsia">3 looks</span>
+              <h2>Подходящие образы</h2>
+            </div>
+            <button class="ghost-button small">Изменить</button>
+          </div>
+
+          <article class="outfit-card">
+            <div class="mini-doll">
+              <div class="doll-body"></div>
+              <div class="layer top yellow"></div>
+              <div class="layer bottom blue"></div>
+              <div class="layer accessory pink"></div>
+            </div>
+            <div class="outfit-meta">
+              <div class="meta-row">
+                <strong>Summer Combo</strong>
+                <span>92%</span>
+              </div>
+              <p>Пастельный топ + голубые джинсы + сумка в теплых тонах</p>
+              <div class="tag-row">
+                <span>светлый</span>
+                <span>школа</span>
+                <span>+22°</span>
+              </div>
+              <button class="link-button">Посмотреть</button>
+            </div>
+          </article>
+
+          <article class="outfit-card">
+            <div class="mini-doll">
+              <div class="doll-body"></div>
+              <div class="layer top pink"></div>
+              <div class="layer bottom black"></div>
+              <div class="layer accessory beige"></div>
+            </div>
+            <div class="outfit-meta">
+              <div class="meta-row">
+                <strong>Urban Pop</strong>
+                <span>88%</span>
+              </div>
+              <p>Яркий топ, легкая юбка и аксессуары, которые добавляют легкий акцент.</p>
+              <div class="tag-row">
+                <span>яркий</span>
+                <span>вечеринка</span>
+                <span>весна</span>
+              </div>
+              <button class="link-button">Посмотреть</button>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel detail">
+          <div class="section-head row">
+            <div>
+              <span class="badge turquoise">Look 1</span>
+              <h2>Summer Combo</h2>
+            </div>
+            <button class="ghost-button small">Сохранить</button>
+          </div>
+
+          <div class="doll-stage">
+            <div class="doll-body large"></div>
+            <div class="layer top yellow large"></div>
+            <div class="layer bottom blue large"></div>
+            <div class="layer accessory pink large"></div>
+          </div>
+
+          <div class="item-list">
+            <div class="item-card">
+              <div class="item-thumb top-preview"></div>
+              <div>
+                <strong>Топ</strong>
+                <small>Sunny T-shirt</small>
+              </div>
+              <button class="mini-button">Заменить</button>
+            </div>
+
+            <div class="item-card">
+              <div class="item-thumb bottom-preview"></div>
+              <div>
+                <strong>Низ</strong>
+                <small>Coastal Denim</small>
+              </div>
+              <button class="mini-button">Заменить</button>
+            </div>
+
+            <div class="item-card">
+              <div class="item-thumb bag-preview"></div>
+              <div>
+                <strong>Сумка</strong>
+                <small>Mini Shopper</small>
+              </div>
+              <button class="mini-button">Заменить</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel replacement">
+          <div class="section-head row">
+            <div>
+              <span class="badge yellow">Swap</span>
+              <h2>Выберите новый низ</h2>
+            </div>
+            <button class="ghost-button small">Отмена</button>
+          </div>
+          <div class="replacement-grid">
+            <div class="replacement-item">
+              <div class="mini-swatch blue"></div>
+              <span>Blue denim</span>
+            </div>
+            <div class="replacement-item selected">
+              <div class="mini-swatch pink"></div>
+              <span>Pink pleat</span>
+            </div>
+            <div class="replacement-item">
+              <div class="mini-swatch beige"></div>
+              <span>Beige skirt</span>
+            </div>
+            <div class="replacement-item">
+              <div class="mini-swatch black"></div>
+              <span>Black cargo</span>
+            </div>
+          </div>
+          <button class="primary-button">Применить замену</button>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
