@@ -139,6 +139,10 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [linkLoading, setLinkLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [replacementOptions, setReplacementOptions] = useState<CatalogItem[]>([]);
+  const [replacementTarget, setReplacementTarget] = useState<OutfitItem | null>(null);
+  const [selectedReplacementId, setSelectedReplacementId] = useState<string | null>(null);
+  const [replacementLoading, setReplacementLoading] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -181,10 +185,13 @@ export default function App() {
     });
   }, [selectedOutfit, catalog, accessories]);
 
-  const replacementOptions = useMemo(() => {
-    const lowerItems = catalog.filter((item) => item.slot === 'bottom' || item.category === 'dress');
-    return lowerItems.length > 0 ? lowerItems : catalog.slice(0, 4);
-  }, [catalog]);
+  const replacementComposition = useMemo(() => {
+    if (!replacementTarget) return [];
+
+    return replacementTarget.kind === 'item'
+      ? catalog.filter((item) => item.slot === 'bottom' || item.category === 'dress')
+      : accessories.filter((item) => item.slot === 'bottom' || item.category === 'dress');
+  }, [replacementTarget, catalog, accessories]);
 
   const toggleColor = (color: string) => {
     setForm((current) => {
@@ -461,6 +468,68 @@ export default function App() {
     }
   };
 
+  const requestReplacementOptions = async (item: OutfitItem) => {
+    setReplacementTarget(item);
+    setSelectedReplacementId(null);
+    setReplacementLoading(true);
+
+    try {
+      const params = new URLSearchParams({
+        kind: item.kind,
+        slot: item.slot,
+        itemId: item.itemId ?? item.id,
+        colors: form.selectedColors.join(','),
+        season: form.season,
+        event: form.event
+      });
+      const response = await fetch(`/api/outfits/replacements?${params.toString()}`);
+      if (!response.ok) throw new Error('Не удалось загрузить варианты замены');
+      const payload = await response.json();
+      setReplacementOptions(payload.replacements ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось загрузить варианты замены');
+    } finally {
+      setReplacementLoading(false);
+    }
+  };
+
+  const applyReplacement = async () => {
+    if (!selectedOutfit || !replacementTarget || !selectedReplacementId) return;
+    setReplacementLoading(true);
+
+    try {
+      const response = await fetch('/api/outfits/replace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedOutfit.items,
+          targetId: replacementTarget.itemId ?? replacementTarget.id,
+          replacementId: selectedReplacementId,
+          replacementKind: replacementTarget.kind
+        })
+      });
+      if (!response.ok) throw new Error('Не удалось применить замену');
+
+      const payload = await response.json();
+      setOutfits((current) => current.map((outfit) =>
+        outfit.id === selectedOutfit.id ? { ...outfit, items: payload.items } : outfit
+      ));
+      setReplacementOptions([]);
+      setReplacementTarget(null);
+      setSelectedReplacementId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось применить замену');
+    } finally {
+      setReplacementLoading(false);
+    }
+  };
+
+  const cancelReplacement = () => {
+    setReplacementOptions([]);
+    setReplacementTarget(null);
+    setSelectedReplacementId(null);
+  };
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -591,7 +660,7 @@ export default function App() {
                 </div>
               </article>
             ))
-          )}
+          }
         </section>
 
         <section className="panel detail">
@@ -623,7 +692,7 @@ export default function App() {
                     <strong>{item.kind === 'item' ? 'Элемент' : 'Аксессуар'}</strong>
                     <small>{item.label}</small>
                   </div>
-                  <button type="button" className="mini-button">Заменить</button>
+                  <button type="button" className="mini-button" onClick={() => requestReplacementOptions(item)}>Заменить</button>
                 </div>
               ))
             )}
@@ -636,19 +705,21 @@ export default function App() {
               <span className="badge yellow">Swap</span>
               <h2>Выберите новый низ</h2>
             </div>
-            <button type="button" className="ghost-button small">Отмена</button>
+            <button type="button" className="ghost-button small" onClick={cancelReplacement}>Отмена</button>
           </div>
 
           <div className="replacement-grid">
             {replacementOptions.map((item) => (
-              <div key={item.id} className="replacement-item selected">
+              <div key={item.id} className={`replacement-item ${selectedReplacementId === item.id ? 'selected' : ''}`} onClick={() => setSelectedReplacementId(item.id)}>
                 <div className="mini-swatch" style={{ background: item.color.includes('blue') ? 'linear-gradient(135deg, #8ec9ff, #4b8ef7)' : item.color.includes('pink') ? 'linear-gradient(135deg, #ffc3de, #ff7ac7)' : 'linear-gradient(135deg, #f4dfcf, #d3aa8d)' }} />
                 <span>{item.name}</span>
               </div>
             ))}
           </div>
 
-          <button type="button" className="primary-button">Применить замену</button>
+          <button type="button" className="primary-button" onClick={applyReplacement} disabled={replacementLoading || !selectedReplacementId}>
+            {replacementLoading ? 'Применяем...' : 'Применить замену'}
+          </button>
         </section>
 
         <section className="panel admin-panel">
@@ -883,7 +954,7 @@ export default function App() {
                   </div>
                 </div>
               ))
-            )}
+            }
           </div>
         </section>
       </main>

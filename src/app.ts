@@ -38,6 +38,11 @@ export function createApp() {
   app.use(express.json());
   app.use('/uploads', express.static(uploadDir));
 
+  const distPath = path.resolve(process.cwd(), 'dist-client');
+  if (process.env.NODE_ENV === 'production' && fs.existsSync(path.join(distPath, 'index.html'))) {
+    app.use(express.static(distPath));
+  }
+
   app.get('/', (_req, res) => {
     const clientUrl = `http://localhost:${process.env.VITE_PORT ?? 5174}`;
     const distPath = path.resolve(process.cwd(), 'dist-client');
