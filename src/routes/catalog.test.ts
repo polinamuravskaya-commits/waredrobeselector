@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 
 import { createApp } from '../app.js';
 import { getGoogleCloudStorageBucketName, isGoogleCloudStorageEnabled } from '../services/gcpStorage.js';
@@ -125,6 +126,53 @@ test('admin routes require credentials when admin auth is enabled', async () => 
     assert.equal(authorized.status, 200);
     assert.ok(authorized.body.rules);
   } finally {
+    if (previousUsername === undefined) {
+      delete process.env.ADMIN_USERNAME;
+    } else {
+      process.env.ADMIN_USERNAME = previousUsername;
+    }
+
+    if (previousPassword === undefined) {
+      delete process.env.ADMIN_PASSWORD;
+    } else {
+      process.env.ADMIN_PASSWORD = previousPassword;
+    }
+  }
+});
+
+test('admin routes accept a JWT bearer token when configured', async () => {
+  const previousJwtSecret = process.env.ADMIN_JWT_SECRET;
+  const previousUsername = process.env.ADMIN_USERNAME;
+  const previousPassword = process.env.ADMIN_PASSWORD;
+
+  process.env.ADMIN_JWT_SECRET = 'super-secret-admin-key';
+  delete process.env.ADMIN_USERNAME;
+  delete process.env.ADMIN_PASSWORD;
+
+  try {
+    const unauthorized = await requestJson('/api/admin/config/rules');
+    assert.equal(unauthorized.status, 401);
+
+    const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+    const payload = Buffer.from(JSON.stringify({ sub: 'admin', role: 'admin', exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url');
+    const signature = crypto.createHmac('sha256', process.env.ADMIN_JWT_SECRET!).update(`${header}.${payload}`).digest('base64url');
+    const token = `${header}.${payload}.${signature}`;
+
+    const response = await requestJson('/api/admin/config/rules', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    assert.equal(response.status, 200);
+    assert.ok(response.body.rules);
+  } finally {
+    if (previousJwtSecret === undefined) {
+      delete process.env.ADMIN_JWT_SECRET;
+    } else {
+      process.env.ADMIN_JWT_SECRET = previousJwtSecret;
+    }
+
     if (previousUsername === undefined) {
       delete process.env.ADMIN_USERNAME;
     } else {

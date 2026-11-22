@@ -73,6 +73,11 @@ web_modules/
 deploy-local.env
 *.local.env
 
+# Local runtime database and upload artifacts
+data/*.db
+data/*.db-*
+data/uploads/
+
 # deployment secrets
 secrets/
 *.pem

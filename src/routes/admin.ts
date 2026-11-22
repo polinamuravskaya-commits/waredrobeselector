@@ -5,7 +5,7 @@ import { defaultRuleConfig } from '../config/rules.js';
 import type { AiConfig, CropTemplate, RuleConfig } from '../domain.js';
 import { GoogleCloudAiAdapter } from '../services/googleCloudAiAdapter.js';
 import { createAiService } from '../services/aiService.js';
-import { ensureDefaultRuleConfig, getAiConfig, listRules, updateAiConfig, updateRuleConfig } from '../store/catalogStore.js';
+import { ensureDefaultRuleConfig, getAiConfig, listRules, updateAiConfig, updateRuleConfig } from '../store/storeAdapter.js';
 
 const defaultCropTemplates: CropTemplate[] = [
   {

@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { aiModelCatalog } from '../config/ai.js';
 import { createAiService } from '../services/aiService.js';
 import { GoogleCloudAiAdapter } from '../services/googleCloudAiAdapter.js';
-import { getAiConfig } from '../store/catalogStore.js';
+import { getAiConfig } from '../store/storeAdapter.js';
 
 const supportedOperations = ['classification', 'crop', 'generation'] as const;
 

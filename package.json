@@ -14,9 +14,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "tsx --test src/**/*.test.ts",
     "lint": "tsc --noEmit -p tsconfig.json",
-    "cloudrun:smoke": "node -e \"const url = process.env.CLOUD_RUN_URL || process.env.GCP_SERVICE_URL; if (!url) { console.error('Set CLOUD_RUN_URL or GCP_SERVICE_URL'); process.exit(1); } fetch(url + '/api/health').then(async (res) => { const text = await res.text(); console.log('status=' + res.status); console.log(text); if (!res.ok) process.exit(1); }).catch((error) => { console.error(error); process.exit(1); });\""
+    "cloudrun:smoke": "node -e \"const url = process.env.CLOUD_RUN_URL || process.env.GCP_SERVICE_URL; if (!url) { console.error('Set CLOUD_RUN_URL or GCP_SERVICE_URL'); process.exit(1); } fetch(url + '/api/health').then(async (res) => { const text = await res.text(); console.log('status=' + res.status); console.log(text); if (!res.ok) process.exit(1); }).catch((error) => { console.error(error); process.exit(1); });\"",
+    "firestore:seed": "tsx src/scripts/seedFirestore.ts"
   },
   "dependencies": {
+    "@google-cloud/firestore": "^9.4.1",
     "@google-cloud/secret-manager": "^8.0.0",
     "@google-cloud/storage": "^9.0.0",
     "express": "^4.21.2",

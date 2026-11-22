@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import type { Accessory, Item } from '../domain.js';
-import { addAccessory, addItem, getAccessoryById, getItemById, listAccessories, listItems } from '../store/catalogStore.js';
+import { addAccessory, addItem, getAccessoryById, getItemById, listAccessories, listItems } from '../store/storeAdapter.js';
 
 export const catalogRouter = Router();
 

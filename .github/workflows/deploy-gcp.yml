@@ -1,23 +1,26 @@
-name: Deploy to GCP Cloud Run
+name: Test and deploy to GCP Cloud Run
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       id-token: write
 
     env:
-      NODE_ENV: production
-      PORT: 8080
+      PROJECT_ID: gen-lang-client-0467142337
+      REGION: europe-west1
+      SERVICE_NAME: wardrobe-selector
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -32,38 +35,35 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Build app
+      - name: Build application
         run: npm run build
 
-      - name: Authenticate with GCP
+      - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
-      - name: Configure gcloud SDK
+      - name: Configure Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker --quiet
-
-      - name: Build and push image
+      - name: Deploy Cloud Run
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/wardrobe-selector:${{ github.sha }} .
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/wardrobe-selector:${{ github.sha }}
-
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy wardrobe-selector \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/wardrobe-selector:${{ github.sha }} \
-            --platform managed \
-            --region us-central1 \
+          gcloud run deploy "$SERVICE_NAME" \
+            --source . \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
             --allow-unauthenticated \
-            --set-env-vars NODE_ENV=production,PORT=8080 \
-            --set-env-vars GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
-            --set-secrets GOOGLE_CLOUD_API_KEY=google-cloud-api-key:latest
+            --service-account "wardrobe-run-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+            --set-env-vars "NODE_ENV=production,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID,GOOGLE_CLOUD_STORAGE_BUCKET=wardrobe-uploads-$PROJECT_ID,GOOGLE_CLOUD_ENABLED=true,GOOGLE_CLOUD_MODEL=gemini-1.5-flash,DATA_STORE=firestore,FIRESTORE_DATABASE_ID=onesec" \
+            --set-secrets "GOOGLE_CLOUD_API_KEY=google-cloud-api-key:latest,ADMIN_USERNAME=wardrobe-admin-username:latest,ADMIN_PASSWORD=wardrobe-admin-password:latest,ADMIN_JWT_SECRET=wardrobe-admin-jwt-secret:latest" \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 2 \
+            --timeout 300 \
+            --quiet
 
-      - name: Smoke test Cloud Run health endpoint
+      - name: Smoke test health endpoint
         run: |
-          SERVICE_URL=$(gcloud run services describe wardrobe-selector --region us-central1 --format='value(status.url)')
-          echo "Service URL: $SERVICE_URL"
-          curl -fsS "$SERVICE_URL/api/health"
+          SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --project "$PROJECT_ID" --region "$REGION" --format='value(status.url)')
+          curl --fail --show-error --silent "$SERVICE_URL/api/health"

@@ -87,10 +87,17 @@ export interface Accessory {
   description: string;
 }
 
+export interface OutfitItem {
+  id: string;
+  slot: Slot;
+  kind: 'item' | 'accessory';
+  itemId?: string;
+}
+
 export interface Outfit {
   id: string;
   name: string;
-  items: Array<{ id: string; slot: Slot; kind: 'item' | 'accessory' }>;
+  items: OutfitItem[];
   score: number;
   matchedTags: string[];
 }
